@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/rohitgupta1694/AWSLambdaElasticCacheCRUD/issues"
   },
-  "homepage": "https://github.com/rohitgupta1694/AWSLambdaElasticCacheCRUD#readme"
+  "homepage": "https://github.com/rohitgupta1694/AWSLambdaElasticCacheCRUD#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "pg": "^7.4.3",
+    "pg-hstore": "^2.3.2",
+    "redis": "^2.8.0",
+    "redis-jsonify": "^1.2.0",
+    "sequelize": "^4.38.0",
+    "serverless-http": "^1.6.0"
+  }
 }
