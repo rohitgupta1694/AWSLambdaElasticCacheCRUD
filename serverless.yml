@@ -19,9 +19,35 @@ service: AWSLambdaElasticCacheCrud
 
 provider:
   name: aws
-  runtime: nodejs8.10
-  stage: dev
-  region: us-east-1
+  runtime: nodejs8.10 # Choose development environment according to your taste between C#, Node.js, Python, Go and Java8
+  stage: dev # Choose stage for development or production.
+  region: rds_region # Choose specific AWS region where the RDS instance is.
+  environment: # Add DB Configuration values as environment variables.
+    DB_USER: "db_name"
+    DB_PASSWORD: "db_password"
+    DB_NAME: "db_name"
+    DB_HOST: "db_rds_host_name"
+    DB_PORT: 5432
+    DB_MAX_CONNECTIONS: 10
+    DB_IDLE_TIMEOUT: 300000
+    DB_CONNECTION_TIMEOUT: 1000
+  vpc: # Add security group and subnets configured for RDS instance on AWS Console.
+    securityGroupIds:
+      - sg-xxxxxx
+    subnetIds:
+      - subnet-xxxxxx
+      - subnet-xxxxxx
+  iamRoleStatements:
+    - Effect: Allow
+      Resource: "*"
+      Action:
+        - ec2:CreateNetworkInterface
+        - ec2:DescribeNetworkInterfaces
+        - ec2:DetachNetworkInterface
+        - ec2:DeleteNetworkInterface
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
