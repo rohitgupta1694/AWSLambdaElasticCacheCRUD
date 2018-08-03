@@ -21,22 +21,26 @@ provider:
   name: aws
   runtime: nodejs8.10 # Choose development environment according to your taste between C#, Node.js, Python, Go and Java8
   stage: dev # Choose stage for development or production.
-  region: rds_region # Choose specific AWS region where the RDS instance is.
+  region: ap-south-1 # Choose specific AWS region for lambda function where the other AWS service instance resides.
   environment: # Add DB Configuration values as environment variables.
-    DB_USER: "db_name"
-    DB_PASSWORD: "db_password"
-    DB_NAME: "db_name"
-    DB_HOST: "db_rds_host_name"
+    DB_USER: "dbtestuser"
+    DB_PASSWORD: "testdb_123"
+    DB_NAME: "testdbname"
+    DB_HOST: "postgres-test-db.c3ee6mgcjjlb.ap-south-1.rds.amazonaws.com"
     DB_PORT: 5432
     DB_MAX_CONNECTIONS: 10
     DB_IDLE_TIMEOUT: 300000
     DB_CONNECTION_TIMEOUT: 1000
-  vpc: # Add security group and subnets configured for RDS instance on AWS Console.
+    DB_DIALECT: "postgres"
+    REDIS_PRIMARY_HOST: "lambda-redis-demo-001.1ksd68.0001.aps1.cache.amazonaws.com"  # Add primary end point of AWS ElastiCache for redis if you have 1 or more than one read replica of primary node.
+    REDIS_REPLICA_HOST: "lambda-redis-demo-002.1ksd68.0001.aps1.cache.amazonaws.com" # Add read replica end point of AWS ElastiCache for redis if you have 1 or more than 1 read replica of primary node.
+    REDIS_PORT: 6379
+  vpc:
     securityGroupIds:
-      - sg-xxxxxx
+      - sg-27df764e
     subnetIds:
-      - subnet-xxxxxx
-      - subnet-xxxxxx
+      - subnet-267c576c
+      - subnet-ba0be5d3
   iamRoleStatements:
     - Effect: Allow
       Resource: "*"
