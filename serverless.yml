@@ -23,24 +23,17 @@ provider:
   stage: dev # Choose stage for development or production.
   region: ap-south-1 # Choose specific AWS region for lambda function where the other AWS service instance resides.
   environment: # Add DB Configuration values as environment variables.
-    DB_USER: "dbtestuser"
-    DB_PASSWORD: "testdb_123"
-    DB_NAME: "testdbname"
-    DB_HOST: "postgres-test-db.c3ee6mgcjjlb.ap-south-1.rds.amazonaws.com"
+    DB_USER: "db_name"
+    DB_PASSWORD: "db_password"
+    DB_NAME: "db_name"
+    DB_HOST: "db_rds_host_name"
     DB_PORT: 5432
     DB_MAX_CONNECTIONS: 10
     DB_IDLE_TIMEOUT: 300000
     DB_CONNECTION_TIMEOUT: 1000
-    DB_DIALECT: "postgres"
-    REDIS_PRIMARY_HOST: "lambda-redis-demo-001.1ksd68.0001.aps1.cache.amazonaws.com"  # Add primary end point of AWS ElastiCache for redis if you have 1 or more than one read replica of primary node.
-    REDIS_REPLICA_HOST: "lambda-redis-demo-002.1ksd68.0001.aps1.cache.amazonaws.com" # Add read replica end point of AWS ElastiCache for redis if you have 1 or more than 1 read replica of primary node.
+    REDIS_PRIMARY_HOST: "redis_primary_host_url" # Add primary end point of AWS ElastiCache for redis if you have 1 or more than one read replica of primary node.
+    REDIS_REPLICA_HOST: "redis_read_replica_host_url" # Add read replica end point of AWS ElastiCache for redis if you have 1 or more than 1 read replica of primary node.
     REDIS_PORT: 6379
-  vpc:
-    securityGroupIds:
-      - sg-27df764e
-    subnetIds:
-      - subnet-267c576c
-      - subnet-ba0be5d3
   iamRoleStatements:
     - Effect: Allow
       Resource: "*"
@@ -83,9 +76,19 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
-    handler: app.hello
-
+  testPostgresConnection:
+    handler: app.testPostgresConnection
+    vpc:
+      securityGroupIds:
+        - sg-27df764e
+      subnetIds:
+        - subnet-267c576c
+        - subnet-ba0be5d3
+    events: # events trigger lambda functions
+      - http: # this is an API Gateway HTTP event trigger
+          path: /test_connection
+          method: get
+          cors: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

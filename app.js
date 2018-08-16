@@ -1,16 +1,31 @@
-'use strict';
+"use strict";
+const express = require("express");
+const sls = require("serverless-http");
+const postgresOperations = require("./postgresOperations/postgresOperations");
 
-module.exports.hello = (event, context, callback) => {
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'Go Serverless v1.0! Your function executed successfully!',
-      input: event,
-    }),
-  };
+const app = express();
 
-  callback(null, response);
+app.get("/test_connection", async (req, res, next) => {
+  console.log("Testing lambda function locally");
+  postgresOperations.addJSONData(req, function(error, results) {
+    if (error) {
+      res.status(500).json({
+        message: "Some error occurred" + error
+      });
+    } else {
+      res.status(200).json({
+        body: "Success Response" + results
+      });
+    }
+  });
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
-};
+  //    else {
+  //     res.status(200).json({
+  //     message: 'Welcome to the project-name api' + error
+  // });
+  //   }
+});
+
+app.listen(3001, () => console.log("Example app listening on port 3001!"));
+
+module.exports.testPostgresConnection = sls(app);

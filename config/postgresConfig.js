@@ -1,5 +1,6 @@
-module.exports = isPrimary => {
+module.exports = function(isPrimary) {
   const { Client } = require("pg");
+
   const databaseUser = process.env.DB_USER;
   const databasePassword = process.env.DB_PASSWORD;
   const databaseName = process.env.DB_NAME;
@@ -10,25 +11,28 @@ module.exports = isPrimary => {
   const databaseConnectionTimeout = process.env.DB_CONNECTION_TIMEOUT;
 
   let dbConfig = {
-    user: databaseUser,
-    password: databasePassword,
-    database: databaseName,
-    host: databaseHost,
-    port: databasePort,
-    max: databaseMaxCon,
-    idleTimeoutMillis: databaseIdleTimeout,
-    connectionTimeoutMillis: databaseConnectionTimeout
+    user: "postgres",
+    password: "dogether",
+    database: "testdbname",
+    host: "127.0.0.1",
+    port: 5432,
+    max: 10,
+    idleTimeoutMillis: 300000,
+    connectionTimeoutMillis: 1000
   };
 
-  const client = new Client();
+  console.log("argument value: ", isPrimary);
+  console.log("DB Configuration Values: ", dbConfig);
+  const client = new Client(dbConfig);
   client
     .connect()
     .then(() => {
-      console.log("connected");
+      console.log("PG Client connected");
       return this.client;
     })
-    .catch(err => {
-      console.error("connection error", err.stack);
-      return err;
+    .catch(e => {
+      console.error("PG Client connection error", e.stack);
     });
+
+    // return new Client().connect();
 };
