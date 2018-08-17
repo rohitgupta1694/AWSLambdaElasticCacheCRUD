@@ -14,7 +14,7 @@ app.get("/test_connection", async (req, res, next) => {
       });
     } else {
       res.status(200).json({
-        body: "Success Response" + results
+        message: "Success Response" + results
       });
     }
   });

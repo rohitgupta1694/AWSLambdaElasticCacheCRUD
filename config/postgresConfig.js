@@ -1,4 +1,4 @@
-module.exports = function(isPrimary) {
+module.exports = function(isPrimary, callback) {
   const { Client } = require("pg");
 
   const databaseUser = process.env.DB_USER;
@@ -28,10 +28,11 @@ module.exports = function(isPrimary) {
     .connect()
     .then(() => {
       console.log("PG Client connected");
-      return this.client;
+      callback(null, client);
     })
     .catch(e => {
       console.error("PG Client connection error", e.stack);
+      callback(e.stack, null);
     });
 
     // return new Client().connect();
