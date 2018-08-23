@@ -5,8 +5,7 @@ const postgresOperations = require("./postgresOperations/postgresOperations");
 
 const app = express();
 
-app.get("/test_connection", async (req, res, next) => {
-  console.log("Testing lambda function locally");
+app.get("/add_json_data", async (req, res, next) => {
   postgresOperations.addJSONData(req, function(error, results) {
     if (error) {
       res.status(500).json({
@@ -18,12 +17,21 @@ app.get("/test_connection", async (req, res, next) => {
       });
     }
   });
+});
 
-  //    else {
-  //     res.status(200).json({
-  //     message: 'Welcome to the project-name api' + error
-  // });
-  //   }
+app.get("/get_movies", async (req, res, next) => {
+  console.log("Getting all movies from postgres");
+  postgresOperations.getAllMovies(req, function(error, results) {
+    if (error) {
+      res.status(500).json({
+        message: "Some error occurred" + error
+      });
+    } else {
+      res.status(200).json({
+        message: "Success Response" + results
+      });
+    }
+  });
 });
 
 app.listen(3001, () => console.log("Example app listening on port 3001!"));
