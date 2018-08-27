@@ -1,3 +1,4 @@
+// Basic Postgres Operations
 const insertJSONDataToTable = function(client, callback) {
   const jsonData =
     '[{"movie_id": 56,"title": "Cimarron Kid, The","genre": "Western","average_rating": 4.3,"release_year": "06-Sep-2013"},' +
@@ -11,58 +12,50 @@ const insertJSONDataToTable = function(client, callback) {
     '{"movie_id": 25,"title": "X-Men","genre": "Action|Adventure|Sci-Fi","average_rating": 1.9,"release_year": "08-Jan-1990"},' +
     '{"movie_id": 58,"title": "Batman and The Dark Knight Rises","genre": "Action|Thriller","average_rating": 4.8,"release_year": "26-Jul-2016"}]';
   const query =
-    "insert into incredibles select * from json_populate_recordset(null::incredibles, '" +
+    "insert into movies select * from json_populate_recordset(null::movies, '" +
     jsonData +
     "')";
 
   client
     .query(query)
     .then(res => {
-      console.log(
-        "Successfully inserted all the data in Incredibles table.",
-        res
-      );
+      console.log("Successfully inserted all the data in Movies table.", res);
       callback(null, res);
     })
     .catch(e => {
-      console.log("Error Occured inside private function:", e.stack);
-      callback(e.stack, null);
+      console.log("Error Occured inside insert function:", e.stack);
+      callback(e, null);
     });
 };
 
 const createAndAddJSONData = function(client, callback) {
   client
     .query(
-      "CREATE TABLE INCREDIBLES(movie_id INT, title VARCHAR, genre VARCHAR, average_rating DECIMAL(2,1), release_year DATE);"
+      "CREATE TABLE MOVIES(movie_id INT, title VARCHAR, genre VARCHAR, average_rating DECIMAL(2,1), release_year DATE);"
     )
     .then(res => {
-      console.log("Incredibles table created");
-      getAllMoviesQuery(event, client, function(error, response) {
-        if (error) {
-          callback(errorMessage, null);
-          client.end();
-        } else {
-          console.log("Got all the data: ", response);
-          client.end();
-        }
-      });
-      client.end();
+      console.log("Movies table created");
+      callback(null, res);
     })
     .catch(e => {
-      if (e.stack.includes("already exists")) {
-        insertJSONDataToTable(client, callback);
-        client.end();
-      } else {
-        callback(e.stack, null);
-        client.end();
-      }
+      console.log("Error Occured inside create table function:", e.stack);
+      callback(e, null);
     });
 };
-const getAllMoviesQuery = function(event, client, callback) {
+// Basic Postgres Operations
+
+// Get All Movies Logic Block
+const getAllMoviesQuery = function(client, callback) {
   client
-    .query("SELECT * FROM INCREDIBLES")
-    .then(res => callback(null, res))
-    .catch(error => callback(error.stack, null));
+    .query("SELECT * FROM MOVIES")
+    .then(res => {
+      console.log("Got all the data: ", res);
+      callback(null, res);
+    })
+    .catch(error => {
+      console.error("There is some error in fetching all data: ", error.stack);
+      callback(error, null);
+    });
 };
 
 module.exports.getAllMovies = function(event, callback) {
@@ -70,35 +63,72 @@ module.exports.getAllMovies = function(event, callback) {
     if (error) {
       callback(error, null);
     } else {
-      getAllMoviesQuery(event, client, function(error, response)) {
-        if(error) {
-          if (error.stack.includes("does not exist")) {
-            createAndAddJSONData(client, callback);
-          } else {
-            callback(error.stack, null);
-            client.end();
-          }
+      getAllMoviesQuery(client, function(error, response) {
+        if (error && error.stack.includes("does not exist")) {
+          createAndAddJSONData(client, function(error, response) {
+            if (error && error.stack.includes("already exists")) {
+              insertJSONDataToTable(client, function(errorMessage, response) {
+                if (errorMessage) {
+                  callback(errorMessage, null);
+                  client.end();
+                } else {
+                  getAllMoviesQuery(client, function(error, response) {
+                    if (error) {
+                      callback(errorMessage, null);
+                      client.end();
+                    } else {
+                      callback(null, response.rows);
+                      client.end();
+                    }
+                  });
+                }
+              });
+            } else if (error) {
+              callback(error.stack, null);
+              client.end();
+            } else {
+              insertJSONDataToTable(client, function(errorMessage, response) {
+                if (errorMessage) {
+                  callback(errorMessage, null);
+                  client.end();
+                } else {
+                  getAllMoviesQuery(client, function(error, response) {
+                    if (error) {
+                      callback(errorMessage, null);
+                      client.end();
+                    } else {
+                      callback(null, response);
+                      client.end();
+                    }
+                  });
+                }
+              });
+            }
+          });
+        } else if (error) {
+          callback(error.stack, null);
+          client.end();
         } else {
-          console.log("Row count: ", res.rowCount === 0);
-          if (res.rowCount === 0) {
+          console.log("Row count: ", response.rowCount);
+          if (response.rowCount === 0) {
             insertJSONDataToTable(client, function(errorMessage, response) {
-              if (error) {
+              if (errorMessage) {
                 callback(errorMessage, null);
                 client.end();
               } else {
-                getAllMoviesQuery(event, client, function(error, response) {
+                getAllMoviesQuery(client, function(error, response) {
                   if (error) {
                     callback(errorMessage, null);
                     client.end();
                   } else {
-                    console.log("Got all the data: ", response);
+                    callback(null, response.rows);
                     client.end();
                   }
                 });
               }
             });
           } else {
-            console.log("Got all the data: ", res);
+            callback(null, response.rows);
             client.end();
           }
         }
@@ -106,3 +136,4 @@ module.exports.getAllMovies = function(event, callback) {
     }
   });
 };
+// Get All Movies Logic Block

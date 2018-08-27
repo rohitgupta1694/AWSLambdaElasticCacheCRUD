@@ -27,8 +27,9 @@ app.get("/get_movies", async (req, res, next) => {
         message: "Some error occurred" + error
       });
     } else {
+      console.log("Response: ", results);
       res.status(200).json({
-        message: "Success Response" + results
+        movies: results
       });
     }
   });
