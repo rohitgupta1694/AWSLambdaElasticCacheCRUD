@@ -97,7 +97,7 @@ module.exports.getAllMovies = function(event, callback) {
                       callback(errorMessage, null);
                       client.end();
                     } else {
-                      callback(null, response);
+                      callback(null, response.rows);
                       client.end();
                     }
                   });

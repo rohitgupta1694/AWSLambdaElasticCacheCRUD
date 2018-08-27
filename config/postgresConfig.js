@@ -11,14 +11,14 @@ module.exports = function(isPrimary, callback) {
   const databaseConnectionTimeout = process.env.DB_CONNECTION_TIMEOUT;
 
   let dbConfig = {
-    user: "postgres",
-    password: "dogether",
-    database: "testdbname",
-    host: "127.0.0.1",
-    port: 5432,
-    max: 10,
-    idleTimeoutMillis: 300000,
-    connectionTimeoutMillis: 1000
+    user: databaseUser,
+    password: databasePassword,
+    database: databaseName,
+    host: databaseHost,
+    port: databasePort,
+    max: databaseMaxCon,
+    idleTimeoutMillis: databaseIdleTimeout,
+    connectionTimeoutMillis: databaseConnectionTimeout
   };
 
   console.log("argument value: ", isPrimary);
@@ -35,5 +35,5 @@ module.exports = function(isPrimary, callback) {
       callback(e.stack, null);
     });
 
-    // return new Client().connect();
+  // return new Client().connect();
 };

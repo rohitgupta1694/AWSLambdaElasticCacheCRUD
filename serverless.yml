@@ -21,7 +21,7 @@ provider:
   name: aws
   runtime: nodejs8.10 # Choose development environment according to your taste between C#, Node.js, Python, Go and Java8
   stage: dev # Choose stage for development or production.
-  region: ap-south-1 # Choose specific AWS region for lambda function where the other AWS service instance resides.
+  region: rds_region # Choose specific AWS region for lambda function where the other AWS service instance resides.
   environment: # Add DB Configuration values as environment variables.
     DB_USER: "db_name"
     DB_PASSWORD: "db_password"
@@ -34,6 +34,12 @@ provider:
     REDIS_PRIMARY_HOST: "redis_primary_host_url" # Add primary end point of AWS ElastiCache for redis if you have 1 or more than one read replica of primary node.
     REDIS_REPLICA_HOST: "redis_read_replica_host_url" # Add read replica end point of AWS ElastiCache for redis if you have 1 or more than 1 read replica of primary node.
     REDIS_PORT: 6379
+  vpc: # Add security group and subnets configured for RDS instance on AWS Console.
+    securityGroupIds:
+      - sg-xxxxxx
+    subnetIds:
+      - subnet-xxxxxx
+      - subnet-xxxxxx
   iamRoleStatements:
     - Effect: Allow
       Resource: "*"
@@ -86,8 +92,8 @@ functions:
         - subnet-ba0be5d3
     events: # events trigger lambda functions
       - http: # this is an API Gateway HTTP event trigger
-          path: /test_connection
-          method: get
+          path: /get_movies
+          method: GET
           cors: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
