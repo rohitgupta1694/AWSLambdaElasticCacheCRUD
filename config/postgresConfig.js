@@ -1,4 +1,4 @@
-module.exports = function(isPrimary, callback) {
+module.exports = function(callback) {
   const { Client } = require("pg");
 
   const databaseUser = process.env.DB_USER;
@@ -11,14 +11,14 @@ module.exports = function(isPrimary, callback) {
   const databaseConnectionTimeout = process.env.DB_CONNECTION_TIMEOUT;
 
   let dbConfig = {
-    user: databaseUser,
-    password: databasePassword,
-    database: databaseName,
-    host: databaseHost,
-    port: databasePort,
-    max: databaseMaxCon,
-    idleTimeoutMillis: databaseIdleTimeout,
-    connectionTimeoutMillis: databaseConnectionTimeout
+    user: "postgres",
+    password: "dogether",
+    database: "testdbname",
+    host: "127.0.0.1",
+    port: 5432,
+    max: 10,
+    idleTimeoutMillis: 300000,
+    connectionTimeoutMillis: 1000
   };
 
   console.log("argument value: ", isPrimary);

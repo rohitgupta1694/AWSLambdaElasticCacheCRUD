@@ -59,7 +59,7 @@ const getAllMoviesQuery = function(client, callback) {
 };
 
 module.exports.getAllMovies = function(event, callback) {
-  require("../config/postgresConfig")(true, function(error, client) {
+  require("../config/postgresConfig")(function(error, client) {
     if (error) {
       callback(error, null);
     } else {
